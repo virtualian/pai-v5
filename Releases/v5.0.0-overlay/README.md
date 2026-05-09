@@ -32,13 +32,20 @@ PAI self-updates Class-C files (notably `AISTEERINGRULES.md` via `/learn` and
 | `PAI/AISTEERINGRULES.md` | A | runtime (auto-extended; 95 lines) | System-level behavioural rules ("Surgical fixes only", "Never assert without verification", scope-lock, etc.). Vanilla v5.0.0 has none. **System file**, not the user-overrides at `PAI/USER/AISTEERINGRULES.md` (which is Class C). |
 | `PAI/ALGORITHM/askuq-gate.md` | A | synthesised | Addendum to v6.3.0 OBSERVE phase: makes AskUserQuestion ENUMERATE→OFFER a phase-exit hard gate (fork's v3.7.0 had it; v6.3.0 mentions but doesn't gate). |
 | `hooks/SecurityValidator.hook.ts` | A | v4 ≡ runtime | PreToolUse hard-block for catastrophic destructive ops (`rm -rf ~`, etc.) and confirm-gate for sensitive ones. Vanilla v5.0.0 has SecurityPipeline + ContentScanner + PromptGuard + ContainmentGuard but lacks the per-pattern destructive-intent gate. |
-| `PAI/PAI-Install/engine/pai-paths.ts` | A | v4.0.3+ committed | **Shared path resolver** (commit `2a44839`, fork PR #162/#163). Reads `CLAUDE_CONFIG_DIR` + `PAI_DIR` env vars with sane defaults; eliminates hard-coded `~/.claude/` literals across migrators. Foundation of two-root architecture work (issue #3). NEVER deployed to marrair runtime — committed-but-not-installed. |
-| `PAI/PAI-Install/engine/pai-runtime-migration.ts` | A | v4.0.3+ committed | Runtime migrator that moves `~/.claude/{PAI,hooks,MEMORY,…}` → `~/.pai/` when env vars indicate two-root. |
-| `PAI/PAI-Install/engine/{memory,skill,command}-migration{,.test}.ts` | A | v4.0.3+ committed | Per-subtree migrators (PR #110, #121, #114). Move MEMORY, skills, commands respectively. With unit tests for memory and skill migrators. |
-| `PAI/PAI-Install/engine/exec.ts` | A | v4.0.3+ committed | `tryExec` extraction (PR #121, #107). Migration helpers' shared error-handling. |
 | `PAI/PAI-Install/engine/repo-url.ts` | A | v4.0.3+ committed | Repo URL helper for installer flows. |
-| `PAI/TOOLS/preserve-claudemd.ts` + `.test.ts` | A | v4.0.3+ committed | Preserves user `CLAUDE.md` `@-imports` + safety backup on rebuild (PR #126/#127). |
-| `PAI/TOOLS/WorkArchival.ts` | A | v4.0.3+ committed | Archival tool for completed work entries. |
+| `PAI/TOOLS/preserve-claudemd.ts` + `.test.ts` | A | v4.0.3+ committed | Preserves user `CLAUDE.md` `@-imports` + safety backup on rebuild (PR #126/#127). Independent of two-root. |
+| `PAI/TOOLS/WorkArchival.ts` | A | v4.0.3+ committed | Archival tool for completed work entries. Independent of two-root. |
+
+### Files NOT in this overlay (deliberately)
+
+- **Two-root migration machinery** (`pai-paths.ts`, `pai-runtime-migration.ts`,
+  `memory-migration{,.test}.ts`, `skill-migration{,.test}.ts`,
+  `command-migration.ts`, `exec.ts`) — present in `Releases/v4.0.3+/.claude/PAI-Install/engine/`
+  on `virtualian/pai`, but not pulled in here. The two-root architecture
+  port (HIGH#3 in the design doc; was issue #3 on this fork) is not being
+  implemented; these 7 files exist solely to support that migration. If
+  the decision changes later, they're recoverable from `virtualian/pai`'s
+  `Releases/v4.0.3+/.claude/PAI-Install/engine/`.
 | `settings.json.overlay` | B | synthesised | JSON-merge snippet wiring AISTEERINGRULES into `loadAtStartup`, registering SecurityValidator under `hooks.PreToolUse`, and setting `voiceEnabled: false` (replaces fork's voice-removal cascade). |
 
 ## Source authority rule
