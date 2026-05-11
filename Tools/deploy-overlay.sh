@@ -4,6 +4,7 @@
 #
 # Class A (pure overlay): rsync verbatim → ~/.claude/<path>
 # Class B (merge):        *.overlay files → jq deep-merge into ~/.claude/<base>
+# Class B-imports:        *.imports files → @-import-merge into ~/.claude/<base>
 # Class C/D:              never in overlay (see Releases/v5.0.0-overlay/README.md)
 #
 # Idempotent. Run after every fresh upstream install or whenever
@@ -39,6 +40,7 @@ echo "deploying overlay $OVERLAY_DIR → $LIVE_DIR"
 rsync -a --checksum \
   --exclude='README.md' \
   --exclude='*.overlay' \
+  --exclude='*.imports' \
   "$OVERLAY_DIR/" "$LIVE_DIR/"
 
 # Class B: per-file JSON deep-merge
@@ -71,6 +73,47 @@ while IFS= read -r -d '' overlay_file; do
     echo "  unchanged: $base_rel"
   fi
 done < <(find "$OVERLAY_DIR" -type f -name '*.overlay' -print0)
+
+# Class B-imports: per-file @-imports merge for markdown files (e.g. CLAUDE.md)
+# For each <path>.imports file under overlay/, ensure each @-import line is
+# present in <path> under live/. New lines are inserted after the last existing
+# @-line in live (or appended if none). Idempotent: skips lines already present.
+# Comment lines ('#' prefix) and blank lines in .imports are ignored.
+while IFS= read -r -d '' imports_file; do
+  rel_path="${imports_file#$OVERLAY_DIR/}"
+  base_rel="${rel_path%.imports}"
+  live_target="$LIVE_DIR/$base_rel"
+
+  if [[ ! -f "$live_target" ]]; then
+    echo "  WARN: live target $live_target missing — cannot @import-merge"
+    continue
+  fi
+
+  added=0
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    if grep -Fxq "$line" "$live_target"; then
+      continue
+    fi
+    last_at_lineno="$(grep -n '^@' "$live_target" | tail -1 | cut -d: -f1 || true)"
+    tmpfile="$(mktemp)"
+    if [[ -n "$last_at_lineno" ]]; then
+      awk -v ln="$last_at_lineno" -v new="$line" 'NR==ln{print; print new; next}{print}' "$live_target" > "$tmpfile"
+    else
+      cat "$live_target" > "$tmpfile"
+      printf '%s\n' "$line" >> "$tmpfile"
+    fi
+    mv "$tmpfile" "$live_target"
+    added=$((added + 1))
+    echo "    + @import: $line"
+  done < "$imports_file"
+
+  if [[ $added -gt 0 ]]; then
+    echo "  @import-merged: $base_rel ($added line(s) added)"
+  else
+    echo "  unchanged: $base_rel"
+  fi
+done < <(find "$OVERLAY_DIR" -type f -name '*.imports' -print0)
 
 # WARNING: jq's `*` operator REPLACES arrays rather than concatenating.
 # For settings.json's loadAtStartup and hooks.PreToolUse arrays, the overlay's
