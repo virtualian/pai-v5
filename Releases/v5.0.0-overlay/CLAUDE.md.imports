@@ -1,0 +1,10 @@
+# CLAUDE.md.imports — overlay directive file (Class B-imports)
+#
+# Each non-comment, non-blank line is an @import that the overlay
+# ensures is present in ~/.claude/CLAUDE.md. Deploy is idempotent:
+# duplicates are skipped, missing entries are inserted after the
+# last existing @-line (or appended at EOF if none).
+#
+# See Tools/deploy-overlay.sh (Class B-imports loop) and pai-v5#7.
+
+@PAI/AISTEERINGRULES.md
