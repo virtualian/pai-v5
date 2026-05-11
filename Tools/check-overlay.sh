@@ -36,7 +36,7 @@ echo
 while IFS= read -r -d '' overlay_file; do
   rel_path="${overlay_file#$OVERLAY_DIR/}"
   case "$rel_path" in
-    README.md|*.overlay) continue ;;
+    README.md|*.overlay|*.imports) continue ;;
   esac
   live_target="$LIVE_DIR/$rel_path"
 
@@ -91,5 +91,31 @@ while IFS= read -r -d '' overlay_file; do
   fi
 done < <(find "$OVERLAY_DIR" -type f -name '*.overlay' -print0)
 
+# Class B-imports files
+while IFS= read -r -d '' imports_file; do
+  rel_path="${imports_file#$OVERLAY_DIR/}"
+  base_rel="${rel_path%.imports}"
+  live_target="$LIVE_DIR/$base_rel"
+
+  if [[ ! -f "$live_target" ]]; then
+    printf '  %-7s  %s   (live %s missing; deploy will warn)\n' 'keep' "$rel_path" "$base_rel"
+    continue
+  fi
+
+  missing=()
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    if ! grep -Fxq "$line" "$live_target"; then
+      missing+=("$line")
+    fi
+  done < "$imports_file"
+
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    printf '  %-7s  %s   (all @imports present in live)\n' 'ok' "$rel_path"
+  else
+    printf '  %-7s  %s   (missing @imports: %s)\n' 'merge' "$rel_path" "${missing[*]}"
+  fi
+done < <(find "$OVERLAY_DIR" -type f -name '*.imports' -print0)
+
 echo
-echo "done. legend: drop?=upstream may have absorbed; keep=overlay still needed; merge=manual reconcile; ok=Class B in sync."
+echo "done. legend: drop?=upstream may have absorbed; keep=overlay still needed; merge=manual reconcile; ok=Class B/Class B-imports in sync."
