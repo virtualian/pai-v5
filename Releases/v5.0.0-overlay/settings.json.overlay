@@ -1,25 +1,5 @@
 {
   "_overlay_doc": "Class B merge snippet — applied via jq deep-merge in deploy-overlay.sh. Keys present here are merged into vanilla settings.json; keys absent here are left as upstream provides. Top-level _overlay_doc is stripped before merge.",
-  "loadAtStartup": [
-    {
-      "path": "PAI/AISTEERINGRULES.md",
-      "_why": "fork-side behavioural discipline (Surgical fixes, Never assert without verification, scope-lock, ENUMERATE→OFFER, etc.); auto-loaded at session start"
-    }
-  ],
   "voiceEnabled": false,
-  "_voiceEnabled_why": "fork posture; replaces v3.x voice-removal cascade by configuring v5's VoiceCompletion hook to no-op",
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash|Edit|Write|Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/SecurityValidator.hook.ts",
-            "_why": "fork-side hard-block for catastrophic destructive ops (rm -rf ~, etc.) and confirm-gate for sensitive ones; complements v5's SecurityPipeline rather than replacing it"
-          }
-        ]
-      }
-    ]
-  }
+  "_voiceEnabled_why": "fork posture; replaces v3.x voice-removal cascade by configuring v5's VoiceCompletion hook to no-op"
 }

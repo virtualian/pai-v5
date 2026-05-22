@@ -1,6 +1,6 @@
 # AI Steering Rules — System
 
-Universal behavioral rules for PAI. Force-loaded at session start via `settings.json → loadAtStartup`.
+Universal behavioral rules for PAI. Force-loaded at session start via `@PAI/AISTEERINGRULES.md` import in `CLAUDE.md`.
 Personal overrides in `USER/AISTEERINGRULES.md`.
 
 ---

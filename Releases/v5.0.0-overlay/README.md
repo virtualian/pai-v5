@@ -16,7 +16,7 @@ upstream upgrade.
 
 | Class | Examples | Strategy | In overlay? |
 |---|---|---|---|
-| **A. Pure overlay** | `SecurityValidator.hook.ts`, modified `Algorithm/*.md` patches, hook overlays | Replace via rsync | YES |
+| **A. Pure overlay** | `askuq-gate.md`, modified `Algorithm/*.md` patches, hook overlays | Replace via rsync | YES |
 | **B. Merge-semantics** | `settings.json` (CC adds keys; user adds permissions), `CLAUDE.md` | Per-file merge logic in `deploy-overlay.sh` (JSON merge, section append) | YES (as `*.overlay` files) |
 | **C. Self-updating** | `AISTEERINGRULES.md` (auto-extended by `/learn`), `MEMORY/**`, `USER/PRINCIPAL_IDENTITY.md`, `USER/DA_IDENTITY.md` | One-time copy at Phase C cutover, then leave alone | NO — personalisation transfer list |
 | **D. Runtime state** | `history.jsonl`, `sessions/`, `cache/`, `.credentials.json` | Never tracked anywhere | NO |
@@ -31,7 +31,6 @@ PAI self-updates Class-C files (notably `AISTEERINGRULES.md` via `/learn` and
 |---|---|---|---|
 | `PAI/AISTEERINGRULES.md` | A | runtime (auto-extended; 95 lines) | System-level behavioural rules ("Surgical fixes only", "Never assert without verification", scope-lock, etc.). Vanilla v5.0.0 has none. **System file**, not the user-overrides at `PAI/USER/AISTEERINGRULES.md` (which is Class C). |
 | `PAI/ALGORITHM/askuq-gate.md` | A | synthesised | Addendum to v6.3.0 OBSERVE phase: makes AskUserQuestion ENUMERATE→OFFER a phase-exit hard gate (fork's v3.7.0 had it; v6.3.0 mentions but doesn't gate). |
-| `hooks/SecurityValidator.hook.ts` | A | v4 ≡ runtime | PreToolUse hard-block for catastrophic destructive ops (`rm -rf ~`, etc.) and confirm-gate for sensitive ones. Vanilla v5.0.0 has SecurityPipeline + ContentScanner + PromptGuard + ContainmentGuard but lacks the per-pattern destructive-intent gate. |
 | `PAI/PAI-Install/engine/repo-url.ts` | A | v4.0.3+ committed | Repo URL helper for installer flows. |
 | `PAI/TOOLS/preserve-claudemd.ts` + `.test.ts` | A | v4.0.3+ committed | Preserves user `CLAUDE.md` `@-imports` + safety backup on rebuild (PR #126/#127). Independent of two-root. |
 | `PAI/TOOLS/WorkArchival.ts` | A | v4.0.3+ committed | Archival tool for completed work entries. Independent of two-root. |
@@ -46,7 +45,7 @@ PAI self-updates Class-C files (notably `AISTEERINGRULES.md` via `/learn` and
   implemented; these 7 files exist solely to support that migration. If
   the decision changes later, they're recoverable from `virtualian/pai`'s
   `Releases/v4.0.3+/.claude/PAI-Install/engine/`.
-| `settings.json.overlay` | B | synthesised | JSON-merge snippet wiring AISTEERINGRULES into `loadAtStartup`, registering SecurityValidator under `hooks.PreToolUse`, and setting `voiceEnabled: false` (replaces fork's voice-removal cascade). |
+| `settings.json.overlay` | B | synthesised | JSON-merge snippet setting `voiceEnabled: false` (replaces fork's voice-removal cascade). |
 
 ## Source authority rule
 
