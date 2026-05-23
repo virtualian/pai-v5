@@ -25,6 +25,14 @@ PAI self-updates Class-C files (notably `AISTEERINGRULES.md` via `/learn` and
 `MEMORY/**` via the auto-memory system). If those lived in the overlay, every
 `deploy-overlay.sh` run would stomp accumulated state.
 
+> **Exception — `PAI/USER/SECURITY/PATTERNS.yaml`.** The model above treats `USER/`-tree
+> files as personalisation (Class C, not overlaid). `PATTERNS.yaml` is the deliberate
+> exception: it is a *static* security config (the catastrophic-command guardrail), not
+> self-updating personalisation, so it does not fit Class C. A hardened copy is tracked as
+> **Class A** so the security fix is version-controlled and redeploys with the overlay.
+> Trade-off: `deploy-overlay.sh` rsync-overwrites the live file, so any user-local edit to
+> `PATTERNS.yaml` on a target host is clobbered on next deploy. (pai-v5#12)
+
 ## Current contents
 
 | Path | Class | Source | Why it's here |
@@ -34,6 +42,7 @@ PAI self-updates Class-C files (notably `AISTEERINGRULES.md` via `/learn` and
 | `PAI/PAI-Install/engine/repo-url.ts` | A | v4.0.3+ committed | Repo URL helper for installer flows. |
 | `PAI/TOOLS/preserve-claudemd.ts` + `.test.ts` | A | v4.0.3+ committed | Preserves user `CLAUDE.md` `@-imports` + safety backup on rebuild (PR #126/#127). Independent of two-root. |
 | `PAI/TOOLS/WorkArchival.ts` | A | v4.0.3+ committed | Archival tool for completed work entries. Independent of two-root. |
+| `PAI/USER/SECURITY/PATTERNS.yaml` | A (exception) | vanilla v5.0.0 + 2 patterns | Hardened security guardrail: adds `bash.blocked` rules for `rm -rf $HOME`/`${HOME}` and recursive `chmod` on root — both passed silently in vanilla (pai-v5#12; upstream issue #1299). First `USER/`-tree file in the overlay — see exception note above. |
 
 ### Files NOT in this overlay (deliberately)
 

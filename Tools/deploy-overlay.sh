@@ -5,6 +5,12 @@
 # Class A (pure overlay): rsync verbatim → ~/.claude/<path>
 # Class B (merge):        *.overlay files → jq deep-merge into ~/.claude/<base>
 # Class C/D:              never in overlay (see Releases/v5.0.0-overlay/README.md)
+#   Exception: PAI/USER/SECURITY/PATTERNS.yaml. It is a USER/-tree file but a
+#   *static* security config (not self-updating personalisation), so it does not
+#   fit Class C. A hardened copy is tracked as Class A so the catastrophic-command
+#   guardrail fix is version-controlled. NOTE: rsync below overwrites the live
+#   file — any user-local edit to PATTERNS.yaml on a target host is clobbered on
+#   deploy. See README "Current contents". (pai-v5#12)
 #
 # Idempotent. Run after every fresh upstream install or whenever
 # the overlay tree changes.
