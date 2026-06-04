@@ -1,5 +1,13 @@
 {
   "_overlay_doc": "Class B merge snippet — applied via jq deep-merge in deploy-overlay.sh. Keys present here are merged into vanilla settings.json; keys absent here are left as upstream provides. Top-level _overlay_doc is stripped before merge.",
   "voiceEnabled": false,
-  "_voiceEnabled_why": "fork posture; replaces v3.x voice-removal cascade by configuring v5's VoiceCompletion hook to no-op"
+  "_voiceEnabled_why": "fork posture; replaces v3.x voice-removal cascade by configuring v5's VoiceCompletion hook to no-op",
+  "statusLine": {
+    "command": "bash $HOME/.claude/PAI/statusline-minimal.sh"
+  },
+  "_statusLine_why": "Class-B override of v5's default statusline entrypoint with the ported compact wrapper. Deep-merge preserves v5's type/refreshInterval; only .command is replaced. The wrapper renders a compact line by default and execs v5's native statusline-command.sh when statusline.mode=full.",
+  "statusline": {
+    "mode": "minimal"
+  },
+  "_statusline_why": "Custom toggle key read by statusline-minimal.sh (lowercase, distinct from Claude Code's capital-L statusLine). 'minimal' (default) = compact line; 'full' = v5's native responsive statusline. Seeded to 'minimal' so the deployed default is the current/short statusline and the toggle is discoverable in settings.json."
 }
