@@ -10,9 +10,9 @@
 
 ## What Are Releases?
 
-Releases are **complete `.claude/` directories** ready to drop into your home folder. Each release contains everything you need: skills, hooks, workflows, memory structure, and configuration.
+A release is a **complete `.claude/` directory** ready to drop into your home folder — skills, hooks, workflows, memory structure, and configuration: everything needed to run PAI.
 
-This is the fastest way to get PAI running. Copy the directory, run the wizard, restart Claude Code.
+The fastest way to install is the one-line installer (below). The release directory is also here to clone, inspect, or copy manually.
 
 > **Note:** The `.claude` directory is hidden by default on macOS/Linux. Use `ls -la` to see it.
 
@@ -20,30 +20,51 @@ This is the fastest way to get PAI running. Copy the directory, run the wizard, 
 
 ## Available Releases
 
-The active release line lives in this directory:
+### v5.0.0 — Life Operating System (Current)
 
-- **[v5.0.0 →](v5.0.0/)** — complete `.claude/` directory, ready to install
-- **[v5.0.0-overlay →](v5.0.0-overlay/)** — overlay directives layered onto an existing `~/.claude/`
+The biggest release in PAI history. PAI is no longer "AI scaffolding" — it's a **Life Operating System**.
 
-Prior version snapshots (`v2.3`–`v4.0.3`) have been removed from the working tree. They
-remain in git history and are reachable via their release tags (e.g. `git checkout v4.0.3`).
+- **Pulse** — the unified daemon on port `31337`: voice, hooks, observability, cron, and the Life Dashboard. Replaces every previous loose service.
+- **The DA** — a Digital Assistant identity layer (PRINCIPAL_IDENTITY + DA_IDENTITY), loaded at session start. `/interview` walks you through naming your DA, picking a voice, and capturing TELOS.
+- **Algorithm v6.3.0** — a seven-phase loop (OBSERVE → THINK → PLAN → BUILD → EXECUTE → VERIFY → LEARN) with a classifier that picks mode (MINIMAL / NATIVE / ALGORITHM) and effort tier per prompt.
+- **The ISA** — the Ideal State Artifact primitive: one document, twelve sections, capturing what "done" looks like for any task.
+- **Containment + release tooling** — privacy is structural. Containment zones declare every directory's privacy class and a guard hook blocks cross-zone leaks; releases pass security gates before publish.
+- **Memory v7.6** — structured by purpose: WORK, KNOWLEDGE (typed graph), LEARNING, RELATIONSHIP, OBSERVABILITY, STATE.
+- **45 skills, 171 workflows, 37 hooks.**
+
+**[Get v5.0.0 →](v5.0.0/)** · **[Release notes →](v5.0.0/README.md)**
+
+### v5.0.0-overlay — Class B-imports overlay
+
+A deliberately thin overlay layered onto an existing vanilla v5.0.0 `~/.claude/`, rather than a full release. It carries a `CLAUDE.md.imports` manifest plus a small `PAI/` subtree of directives — applied on top of a v5.0.0 install instead of replacing it.
+
+**[Get the overlay →](v5.0.0-overlay/)**
+
+> **Earlier versions:** the prior `v2.3`–`v4.0.3` snapshots have been removed from the working tree. They remain in git history and are reachable via their release tags (e.g. `git checkout v4.0.3`).
 
 ---
 
 ## Installation
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/danielmiessler/Personal_AI_Infrastructure.git
-cd Personal_AI_Infrastructure/Releases/v5.0.0
+### One-line install (recommended)
 
-# 2. Copy the release and run the installer
-cp -r .claude ~/ && cd ~/.claude && bash install.sh
+```bash
+curl -sSL https://ourpai.ai/install.sh | bash
 ```
 
-The wizard asks for your name, AI name, timezone, temperature unit, and optional voice preferences.
+The installer verifies Bun, Git, and Claude Code, sets up your DA identity (name + voice + personality), registers Pulse as a service, and validates. An existing `~/.claude/` is backed up first.
 
-See the [main README](../README.md#upgrading-from-a-previous-version) for upgrade instructions.
+### Manual install (clone + run)
+
+```bash
+git clone https://github.com/danielmiessler/Personal_AI_Infrastructure.git
+cd Personal_AI_Infrastructure/Releases/v5.0.0
+cp -R .claude ~/ && cd ~/.claude && ./install.sh
+```
+
+The wizard asks for your name, DA name, timezone, and optional voice preferences.
+
+See the [main README](../README.md#upgrading-from-v4x) for upgrade instructions.
 
 ---
 
